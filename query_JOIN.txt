@@ -59,13 +59,66 @@ WHERE p.name LIKE 'S%'
 
 8- Selezionare le città in cui è stato giocato il gioco dell'anno del 2018 (36)
 
+SELECT t.city AS city
+FROM tournaments t 
+INNER JOIN tournament_videogame tv ON tv.tournament_id = t.id 
+INNER JOIN videogames v ON v.id = tv.videogame_id 
+INNER JOIN award_videogame av ON av.videogame_id = v.id 
+INNER JOIN awards a ON a.id = av.award_id 
+WHERE av.`year` = 2018 AND a.name = 'gioco dell\'anno';
+
 9- Selezionare i giocatori che hanno giocato al gioco più atteso del 2018 in un torneo del 2019 (3306)
 
+SELECT p.name AS player_name
+FROM players p 
+INNER JOIN player_tournament pt ON pt.player_id = p.id 
+INNER JOIN tournaments t ON t.id = pt.tournament_id 
+INNER JOIN tournament_videogame tv ON tv.tournament_id = t.id 
+INNER JOIN videogames v ON v.id = tv.videogame_id 
+INNER JOIN award_videogame av ON av.videogame_id = v.id 
+INNER JOIN awards a ON a.id = av.award_id 
+WHERE av.`year` = 2018 AND a.name = 'gioco più atteso' AND t.`year` = 2019;
+
 Bonus
+
 10- Selezionare i dati della prima software house che ha rilasciato un gioco, assieme ai dati del gioco stesso (software house id : 5)
+
+SELECT sh.id AS id_sh, sh.name AS house_name, v.name AS videog_name, v.release_date AS videog_date
+FROM software_houses sh
+JOIN videogames v ON sh.id = v.software_house_id
+WHERE v.release_date = (SELECT MIN(release_date) FROM videogames);
 
 11- Selezionare i dati del videogame (id, name, release_date, totale recensioni) con più recensioni (videogame id : potrebbe uscire 449 o 398, sono entrambi a 20)
 
+SELECT v.id AS vg_id, v.name AS vg_name, v.release_date AS vg_date, COUNT(*) AS tot_reviews 
+FROM videogames v 
+INNER JOIN reviews r ON r.videogame_id = v.id
+GROUP BY v.id
+ORDER BY tot_reviews DESC
+LIMIT 1; 
+
 12- Selezionare la software house che ha vinto più premi tra il 2015 e il 2016 (software house id : potrebbe uscire 3 o 1, sono entrambi a 3)
 
+SELECT sh.id, sh.name, COUNT(*) AS tot_awards
+FROM software_houses sh
+INNER JOIN videogames v ON v.software_house_id = sh.id
+INNER JOIN award_videogame av ON av.videogame_id = v.id
+INNER JOIN awards a ON a.id = av.award_id
+WHERE av.`year` BETWEEN 2015 AND 2016
+GROUP BY sh.id, sh.name
+ORDER BY tot_awards DESC
+LIMIT 1;
+
+
 13- Selezionare le categorie dei videogame i quali hanno una media recensioni inferiore a 1.5 (10)
+
+inferiore a 1.5 = 0
+superiore a 1.5 = 10
+
+SELECT c.name , AVG(r.rating) AS avg_rating
+FROM categories c
+INNER JOIN category_videogame cv ON cv.category_id = c.id
+INNER JOIN videogames v ON v.id = cv.videogame_id
+INNER JOIN reviews r ON r.videogame_id = v.id
+GROUP BY c.name
+HAVING avg_rating > 1.5;
