@@ -113,7 +113,8 @@ LIMIT 1;
 13- Selezionare le categorie dei videogame i quali hanno una media recensioni inferiore a 1.5 (10)
 
 inferiore a 1.5 = 0
-superiore a 1.5 = 10
+
+superiore a 1.5 = 10 :
 
 SELECT c.name , AVG(r.rating) AS avg_rating
 FROM categories c
@@ -122,3 +123,13 @@ INNER JOIN videogames v ON v.id = cv.videogame_id
 INNER JOIN reviews r ON r.videogame_id = v.id
 GROUP BY c.name
 HAVING avg_rating > 1.5;
+
+superiore a 2.0 = 10 :
+
+SELECT c.name , AVG(r.rating) AS avg_rating
+FROM categories c
+INNER JOIN category_videogame cv ON cv.category_id = c.id
+INNER JOIN videogames v ON v.id = cv.videogame_id
+INNER JOIN reviews r ON r.videogame_id = v.id
+GROUP BY c.name
+HAVING avg_rating > 2.0;
